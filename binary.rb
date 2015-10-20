@@ -59,8 +59,6 @@ class BinaryTree
     if current.value == search_value
       puts "The value #{search_value} was found."
       return current
-    else
-      puts "The value #{search_value} was not found."
     end
     left_search = dfs_rec(search_value, current.left_child) if current.left_child
     return left_search if !left_search.nil?
@@ -91,4 +89,3 @@ tree.breadth_first_search(133)
 tree.depth_first_search(23)
 tree.depth_first_search(8)
 tree.dfs_rec(67)
-tree.dfs_rec(167)

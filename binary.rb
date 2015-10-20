@@ -58,7 +58,9 @@ class BinaryTree
   def dfs_rec search_value, current = @root
     if current.value == search_value
       puts "The value #{search_value} was found."
-      return current 
+      return current
+    else
+      puts "The value #{search_value} was not found."
     end
     left_search = dfs_rec(search_value, current.left_child) if current.left_child
     return left_search if !left_search.nil?

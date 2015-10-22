@@ -1,58 +1,63 @@
+MOVES = [[1, 2],[1, -2],[2, 1],[2,-1],
+        [-1, 2],[-2, 1],[-1, -2],[-2, -1]]
+
+Knight = Struct.new(:start, :parent)
+
 class Board
-	attr_accessor :x, :y, :squares
+  def initialize board_size = 8
+    @board_size = board_size
+  end
 
-	def initialize
-		@x = nil
-		@y = nil
-		@squares = []
-	end
+  def knight_moves root, target
+    return nil unless (valid_position?(root) && valid_position?(target))
+    return root if root == target
 
-	def start_game
-		puts "What are the coordinates of your knight's position?"
-		get_coordinates
-		check_coordinates @x, @y
-		built_squares 8, 8
-		starting_position @x, @y
-	end
+    knight = Knight.new(root, nil)
+    # Enqueue starting position and mark as visited
+    queue = [knight]
+    visited = []
+    solution = []
 
-	def get_coordinates
-		puts "x first please :"
-		@x = gets.chomp.to_i
-		puts "And now y :"
-		@y = gets.chomp.to_i
-	end
+    while knight.start != target do
+      knight = queue.shift
 
-	def check_coordinates x, y
-		get_coordinates if (@x.nil? || @y.nil?)
-		
-		puts "Your knight is on [#{@x},#{@y}]."
-	end
+      if !visited.include?(knight)
+        visited << knight
+        check_moves(knight.start).each do |i|
+          k = Knight.new(i, knight)
+          queue << k
+        end        
+      end
+    end
 
-	def built_squares width, height
-		# Creating an array of specific width
-		# This way all elements initially will be nil
-		@squares = Array.new(width)
-		# For every element of the width array create a new array
-		@squares = @squares.map! { Array.new(height) }
-	end
+    solution << knight.start
+    while knight.parent != nil
+      solution << knight.parent.start
+      knight = knight.parent
+    end
 
-	def starting_position x, y
-		puts @squares[@x][@y] = "start"
-	end
+    puts "You made it in #{(solution.size)-1} moves!"
+    solution.reverse.each { |knight_move| p knight_move }
+
+  end
+
+  def valid_position? pos
+    pos[0].between?(0, @board_size-1) && pos[1].between?(0, @board_size-1)
+  end
+
+  def check_moves root
+    valid_moves = []
+    MOVES.each { |m| valid_moves << current_move(root, m) if valid_position?(current_move(root, m)) }
+    valid_moves
+  end
+
+  def current_move root, m
+    [root[0] + m[0], root[1] + m[1]]
+  end
 end
 
-class Knight
-	attr_accessor :starting_point, :end_point
-
-	def initialize starting_point, end_point
-		@starting_point = starting_point
-		@end_point = end_point
-	end
-
-	def knight_moves starting_point, end_point
-	
-	end
-end
-
-game = Board.new
-game.start_game
+# Tests
+board = Board.new
+board.knight_moves([3,3],[4,3])
+board.knight_moves([3,3],[7,3])
+board.knight_moves([3,3],[1,2])
